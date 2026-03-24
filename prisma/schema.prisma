@@ -18,9 +18,7 @@ model BarberShop {
   name        String
   address     String
   description String
-  email       String              @unique
   imageUrl    String              @default("")
-  password    String
   phones      String[]
   services    BarberShopService[]
 }
