@@ -12,3 +12,34 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model BarberShop {
+  id          String              @id @default(uuid())
+  name        String
+  address     String
+  description String
+  email       String              @unique
+  imageUrl    String              @default("")
+  password    String
+  phones      String[]
+  services    BarberShopService[]
+}
+
+model BarberShopService {
+  id           String     @id @default(uuid())
+  name         String
+  priceInCents Int
+  imageUrl     String     @default("")
+  barbershopId String
+  description  String
+  barbershop   BarberShop @relation(fields: [barbershopId], references: [id])
+}
+
+model Booking {
+  id           String    @id @default(uuid())
+  serviceId    String
+  barbershopId String
+  date         DateTime  @db.Timestamptz
+  canceled     Boolean   @default(false)
+  canceledAt   DateTime? @db.Timestamptz
+}
