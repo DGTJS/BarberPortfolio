@@ -1,25 +1,23 @@
-import "dotenv/config";
+// lib/auth.ts
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "@/app/generated/prisma/client";
+import { PrismaClient } from "@prisma/client";
+import { nextCookies } from "better-auth/next-js";
 
-const connectionString = `${process.env.DATABASE_URL}`;
-
-const adapter = new PrismaPg({ connectionString });
-const prisma = new PrismaClient({ adapter });
+const prisma = new PrismaClient();
 
 export const auth = betterAuth({
+  baseURL: process.env.BETTER_AUTH_URL,
   database: prismaAdapter(prisma, {
-    provider: "postgresql",
+    provider: "postgresql", // ajuste conforme seu banco
   }),
   socialProviders: {
     google: {
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      // Opcional: sempre pedir para selecionar conta
+      // prompt: "select_account",
     },
   },
-  emailAndPassword: {
-    enabled: true,
-  },
+  plugins: [nextCookies()],
 });

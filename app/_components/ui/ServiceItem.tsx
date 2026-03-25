@@ -1,6 +1,6 @@
 import { Button } from "@/app/_components/ui/button";
 import Image from "next/image";
-import { BarberShopService } from "@/app/generated/prisma";
+import { BarberShopService } from "@prisma/client";
 
 interface ServiceItemProps {
   service: BarberShopService;
