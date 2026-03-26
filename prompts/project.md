@@ -29,6 +29,7 @@ Tecnologias utilizadas:
 ## Server Actions
 
 - **SEMPRE** use a biblioteca "next-safe-action" para criar Server Actions.
+- **SEMPRE** usar o include do prisma em requisição
 - **SEMPRE** Use o hook "useAction" da biblioteca "next-safe-action" para chamar uma Server Action.
 - **SEMPRE** use a Server Action @app/\_actions/create-booking.ts como base para criar as suas.
 - **SEMPRE** faça validações de autorização e autenticação em uma Server Action conforme o usuário.

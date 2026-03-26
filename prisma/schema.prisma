@@ -20,6 +20,7 @@ model BarberShop {
   imageUrl    String              @default("")
   phones      String[]
   services    BarberShopService[]
+  bookings    Booking[]
 }
 
 model BarberShopService {
@@ -30,12 +31,16 @@ model BarberShopService {
   barbershopId String
   description  String
   barbershop   BarberShop @relation(fields: [barbershopId], references: [id])
+  bookings     Booking[]
+  
 }
 
 model Booking {
   id           String    @id @default(uuid())
   serviceId    String
   barbershopId String
+  barbershop   BarberShop @relation(fields: [barbershopId], references: [id])
+  service      BarberShopService @relation(fields: [serviceId], references: [id])
   userId       String
   user         User      @relation(fields: [userId], references: [id])
   date         DateTime  @db.Timestamptz

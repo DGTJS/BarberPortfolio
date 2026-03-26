@@ -8,6 +8,7 @@ import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import Logo from "@/public/Logo.png";
 import LogoBlack from "@/public/Logo.svg";
+import Link from "next/link";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -17,22 +18,15 @@ export const Header = () => {
     <>
       <header className="flex justify-between items-center pt-4 px-5 ">
         {/* Logo modo claro */}
-        <Image
-          src={LogoBlack}
-          alt="BarberShop"
-          width={92}
-          height={24}
-          className="block dark:hidden"
-        />
+        <Link href="/" className="block dark:hidden">
+          <Image src={LogoBlack} alt="BarberShop" width={92} height={24} />
+        </Link>
 
         {/* Logo modo escuro */}
-        <Image
-          src={Logo}
-          alt="BarberShop"
-          width={92}
-          height={24}
-          className="hidden dark:block"
-        />
+        <Link href="/" className="hidden dark:block">
+          <Image src={Logo} alt="BarberShop" width={92} height={24} />
+        </Link>
+
         <Button
           variant={"ghost"}
           className="w-12 h-12 rounded-full"
