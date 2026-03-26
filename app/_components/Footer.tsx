@@ -1,0 +1,13 @@
+export const Footer = () => {
+  return (
+    <footer className=" p-7">
+      <p className="text-foreground font-semibold text-xs">
+        &copy; {new Date().getFullYear()} Barbearia. Todos os direitos
+        reservados.
+      </p>
+      <p className="text-muted-foreground font-light text-xs">
+        Desenvolvido por Diego Martins
+      </p>
+    </footer>
+  );
+};
