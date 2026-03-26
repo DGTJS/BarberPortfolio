@@ -9,13 +9,21 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/app/_components/ui/sheet";
+import { Separator } from "./separator";
+import { TimeSlotsSelector } from "@/app/_components/TimeSlotsSelector";
+import { BookingSummary } from "@/app/_components/BookingSummary";
 import Image from "next/image";
 import { BarberShopService } from "@prisma/client";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { ptBR } from "react-day-picker/locale";
-import { Separator } from "./separator";
-
+import { ptBR, se } from "react-day-picker/locale";
+import {
+  formatPriceInBRL,
+  capitalizeFirstLetter,
+  getDefaultServiceDurationInSeconds,
+} from "@/app/_utils/format";
+import { createBookingAction } from "@/app/_actions/create-booking";
+import { useAction } from "next-safe-action/hooks";
 interface ServiceItemProps {
   service: BarberShopService;
   barberShop: {
@@ -24,77 +32,12 @@ interface ServiceItemProps {
   };
 }
 
-type BookingDraft = {
-  service: {
-    id: string;
-    name: string;
-    priceInCents: number;
-    durationInSeconds: number;
-  };
-  barberShop: {
-    id: string;
-    name: string;
-  };
-  date?: Date;
-  time: string | null;
-};
-
-function formatDuration(durationInSeconds: number) {
-  const totalMinutes = Math.max(0, Math.floor(durationInSeconds / 60));
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
-
-  if (hours <= 0) {
-    return `${minutes}min`;
-  }
-
-  if (minutes === 0) {
-    return `${hours}h`;
-  }
-
-  return `${hours}h ${minutes}min`;
-}
-
-function formatPriceInBRL(priceInCents: number) {
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  }).format(priceInCents / 100);
-}
-
-function capitalizeFirstLetter(value: string) {
-  if (!value) return value;
-  return value.charAt(0).toUpperCase() + value.slice(1);
-}
-
-function getDefaultServiceDurationInSeconds(serviceName: string) {
-  const normalizedName = serviceName.toLowerCase();
-
-  if (normalizedName.includes("corte")) return 60 * 60;
-  if (normalizedName.includes("barba")) return 30 * 60;
-  if (normalizedName.includes("sobrancelha")) return 15 * 60;
-  if (normalizedName.includes("pézinho")) return 20 * 60;
-  if (normalizedName.includes("massagem")) return 30 * 60;
-  if (normalizedName.includes("hidratação")) return 30 * 60;
-
-  return 30 * 60;
-}
-
-function buildTimeSlots() {
-  const slots: string[] = [];
-  for (let minutes = 9 * 60; minutes <= 18 * 60; minutes += 30) {
-    const hoursPart = String(Math.floor(minutes / 60)).padStart(2, "0");
-    const minutesPart = String(minutes % 60).padStart(2, "0");
-    slots.push(`${hoursPart}:${minutesPart}`);
-  }
-  return slots;
-}
-
 export const ServiceItem = ({ service, barberShop }: ServiceItemProps) => {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [bookingDraft, setBookingDraft] = useState<BookingDraft | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const { executeAsync, isPending } = useAction(createBookingAction);
 
-  const timeSlots = useMemo(() => buildTimeSlots(), []);
   const serviceDurationInSeconds = useMemo(() => {
     const durationFromDb = (
       service as unknown as { durationInSeconds?: number }
@@ -102,20 +45,11 @@ export const ServiceItem = ({ service, barberShop }: ServiceItemProps) => {
     return durationFromDb ?? getDefaultServiceDurationInSeconds(service.name);
   }, [service]);
 
-  const canConfirm = Boolean(bookingDraft?.date && bookingDraft?.time);
+  const canConfirm = Boolean(selectedDate && selectedTime);
 
   const handleOpenBooking = () => {
-    setBookingDraft({
-      service: {
-        id: service.id,
-        name: service.name,
-        priceInCents: service.priceInCents,
-        durationInSeconds: serviceDurationInSeconds,
-      },
-      barberShop,
-      date: undefined,
-      time: null,
-    });
+    setSelectedDate(undefined);
+    setSelectedTime(null);
     setIsSheetOpen(true);
   };
 
@@ -124,7 +58,8 @@ export const ServiceItem = ({ service, barberShop }: ServiceItemProps) => {
       toast.message("Agendamento cancelado", {
         description: "Você fechou o agendamento sem salvar.",
       });
-      setBookingDraft(null);
+      setSelectedDate(undefined);
+      setSelectedTime(null);
       setIsSheetOpen(false);
       return;
     }
@@ -133,32 +68,27 @@ export const ServiceItem = ({ service, barberShop }: ServiceItemProps) => {
   };
 
   const handleSelectDate = (date?: Date) => {
-    setBookingDraft((current) => {
-      if (!current) return current;
-      return {
-        ...current,
-        date,
-        time: null,
-      };
-    });
+    setSelectedDate(date);
+    setSelectedTime(null);
   };
 
-  const handleSelectTime = (time: string) => {
-    setBookingDraft((current) => {
-      if (!current) return current;
-      return {
-        ...current,
-        time,
-      };
+  const handleConfirm = async () => {
+    if (!selectedDate || !selectedTime) return;
+    const hourSplit = selectedTime!.split(":");
+    const hour = Number(hourSplit[0]);
+    const minute = Number(hourSplit[1]);
+    const date = new Date(selectedDate!);
+    date.setHours(Number(hour));
+    date.setMinutes(Number(minute));
+    const result = await executeAsync({
+      serviceId: service.id,
+      date,
     });
-  };
-
-  const handleConfirm = () => {
-    if (!bookingDraft?.date || !bookingDraft.time) return;
-
-    toast.success("Agendamento confirmado com sucesso!");
-    setBookingDraft(null);
-    setIsSheetOpen(false);
+    if (result.validationErrors?._errors?.[0]) {
+      toast.error(result.validationErrors?._errors?.[0]);
+      return;
+    }
+    toast.success("Horário agendado com sucesso");
   };
 
   return (
@@ -211,7 +141,7 @@ export const ServiceItem = ({ service, barberShop }: ServiceItemProps) => {
               <div>
                 <Calendar
                   mode="single"
-                  selected={bookingDraft?.date}
+                  selected={selectedDate}
                   onSelect={handleSelectDate}
                   showOutsideDays
                   buttonVariant="outline"
@@ -247,79 +177,26 @@ export const ServiceItem = ({ service, barberShop }: ServiceItemProps) => {
             </div>
             <Separator className="bg-muted-foreground/20" />
 
-            {bookingDraft?.date && (
-              <div className="px-5">
-                <div className="overflow-x-auto [&::-webkit-scrollbar]:hidden">
-                  <div className="flex w-max flex-nowrap items-center gap-3">
-                    {timeSlots.map((time) => (
-                      <Button
-                        key={time}
-                        type="button"
-                        variant={
-                          bookingDraft.time === time ? "default" : "outline"
-                        }
-                        className="h-auto rounded-full px-4 py-2 border-accent-foreground"
-                        onClick={() => handleSelectTime(time)}
-                      >
-                        {time}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-            <Separator className="bg-muted-foreground/20" />
-            {bookingDraft?.time && bookingDraft.date && (
-              <div className="px-5">
-                <div className="w-full rounded-[10px] border border-border bg-muted-foreground/25 p-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[16px] font-bold leading-[1.4] text-foreground">
-                      {bookingDraft.service.name}
-                    </span>
-                    <span className="text-[14px] font-bold leading-[1.4] text-foreground">
-                      {formatPriceInBRL(bookingDraft.service.priceInCents)}
-                    </span>
-                  </div>
+            <TimeSlotsSelector
+              selectedTime={selectedTime}
+              onSelectTime={setSelectedTime}
+              isVisible={!!selectedDate}
+            />
 
-                  <div className="mt-3 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[14px] leading-[1.4] text-muted-foreground">
-                        Data
-                      </span>
-                      <span className="text-[14px] leading-[1.4] text-muted-foreground">
-                        {bookingDraft.date.toLocaleDateString("pt-BR", {
-                          day: "2-digit",
-                          month: "long",
-                        })}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-[14px] leading-[1.4] text-muted-foreground">
-                        Horário
-                      </span>
-                      <span className="text-[14px] leading-[1.4] text-muted-foreground">
-                        {bookingDraft.time}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-[14px] leading-[1.4] text-muted-foreground">
-                        Barbearia
-                      </span>
-                      <span className="text-[14px] leading-[1.4] text-muted-foreground">
-                        {bookingDraft.barberShop.name}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-[14px] leading-[1.4] text-muted-foreground">
-                        Duração
-                      </span>
-                      <span className="text-[14px] leading-[1.4] text-muted-foreground">
-                        {formatDuration(bookingDraft.service.durationInSeconds)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <Separator className="bg-muted-foreground/20" />
+
+            {selectedTime && selectedDate && (
+              <BookingSummary
+                service={{
+                  name: service.name,
+                  priceInCents: service.priceInCents,
+                  durationInSeconds: serviceDurationInSeconds,
+                }}
+                barberShop={barberShop}
+                date={selectedDate}
+                time={selectedTime}
+                isVisible={true}
+              />
             )}
 
             <SheetFooter className="mt-auto gap-2 p-0 px-5">
