@@ -12,9 +12,10 @@
 !.yarn/releases
 !.yarn/versions
 .claude/*
+.kilocode/mcp.json
 # testing
 /coverage
-./kilocode/*
+
 
 # next.js
 /.next/
@@ -45,3 +46,5 @@ next-env.d.ts
 
 /app/generated/prisma
 /
+.kilocode/mcp.json
+.kilocode/mcp.json

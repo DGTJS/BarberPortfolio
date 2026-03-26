@@ -1,29 +1,9 @@
 /**
- * Formata a duração em segundos para formato legível.
- * @param durationInSeconds - Duração em segundos
- * @returns String formatada (ex: "1h 30min", "30min", "2h")
- */
-export function formatDuration(durationInSeconds: number): string {
-  const totalMinutes = Math.max(0, Math.floor(durationInSeconds / 60));
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
-
-  if (hours <= 0) {
-    return `${minutes}min`;
-  }
-
-  if (minutes === 0) {
-    return `${hours}h`;
-  }
-
-  return `${hours}h ${minutes}min`;
-}
-
-/**
  * Formata o preço em centavos para formato BRL.
  * @param priceInCents - Preço em centavos
  * @returns String formatada em reais (ex: "R$ 50,00")
  */
+
 export function formatPriceInBRL(priceInCents: number): string {
   return new Intl.NumberFormat("pt-BR", {
     style: "currency",

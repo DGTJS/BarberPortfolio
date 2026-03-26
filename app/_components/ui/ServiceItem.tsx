@@ -154,8 +154,8 @@ export const ServiceItem = ({ service, barberShop }: ServiceItemProps) => {
                   mode="single"
                   selected={selectedDate}
                   onSelect={handleSelectDate}
-                  showOutsideDays
                   buttonVariant="outline"
+                  disabled={{ before: new Date() }}
                   navLayout="after"
                   locale={ptBR}
                   formatters={{
