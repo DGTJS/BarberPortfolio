@@ -6,6 +6,8 @@ import { MenuIcon } from "lucide-react";
 import { MenuSheet } from "./MenuSheet";
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
+import Logo from "@/public/Logo.png";
+import LogoBlack from "@/public/Logo.svg";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -14,7 +16,23 @@ export const Header = () => {
   return (
     <>
       <header className="flex justify-between items-center pt-4 px-5 ">
-        <Image src="/Logo.png" alt="BarberShop" width={100} height={100} />
+        {/* Logo modo claro */}
+        <Image
+          src={LogoBlack}
+          alt="BarberShop"
+          width={92}
+          height={24}
+          className="block dark:hidden"
+        />
+
+        {/* Logo modo escuro */}
+        <Image
+          src={Logo}
+          alt="BarberShop"
+          width={92}
+          height={24}
+          className="hidden dark:block"
+        />
         <Button
           variant={"ghost"}
           className="w-12 h-12 rounded-full"

@@ -24,6 +24,8 @@ import {
 } from "@/app/_utils/format";
 import { createBookingAction } from "@/app/_actions/create-booking";
 import { useAction } from "next-safe-action/hooks";
+import { getDataAvailbleTimeSlots } from "@/app/_actions/get-date-available-time-slots";
+import { useQuery } from "@tanstack/react-query";
 interface ServiceItemProps {
   service: BarberShopService;
   barberShop: {
@@ -37,6 +39,15 @@ export const ServiceItem = ({ service, barberShop }: ServiceItemProps) => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const { executeAsync, isPending } = useAction(createBookingAction);
+  const { data: availableTimeSlots } = useQuery({
+    queryKey: ["data-available-time-slots", service.barbershopId, selectedDate],
+    queryFn: () =>
+      getDataAvailbleTimeSlots({
+        barberShopId: barberShop.id,
+        date: selectedDate!,
+      }),
+    enabled: Boolean(selectedDate),
+  });
 
   const serviceDurationInSeconds = useMemo(() => {
     const durationFromDb = (
@@ -84,11 +95,11 @@ export const ServiceItem = ({ service, barberShop }: ServiceItemProps) => {
       serviceId: service.id,
       date,
     });
-    if (result.validationErrors?._errors?.[0]) {
-      toast.error(result.validationErrors?._errors?.[0]);
-      return;
-    }
     toast.success("Horário agendado com sucesso");
+    if (result.validationErrors?._errors?.[0]) {
+      toast.error("Horario indisponível");
+    }
+    setIsSheetOpen(false);
   };
 
   return (
@@ -181,6 +192,7 @@ export const ServiceItem = ({ service, barberShop }: ServiceItemProps) => {
               selectedTime={selectedTime}
               onSelectTime={setSelectedTime}
               isVisible={!!selectedDate}
+              availableTimeSlots={availableTimeSlots}
             />
 
             <Separator className="bg-muted-foreground/20" />

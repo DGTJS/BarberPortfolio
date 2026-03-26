@@ -1,7 +1,5 @@
 "use client";
 
-import { formatDuration, formatPriceInBRL } from "@/app/_utils/format";
-
 interface BookingSummaryProps {
   service: {
     name: string;
@@ -14,6 +12,29 @@ interface BookingSummaryProps {
   date: Date;
   time: string;
   isVisible: boolean;
+}
+
+export function formatDuration(durationInSeconds: number): string {
+  const totalMinutes = Math.max(0, Math.floor(durationInSeconds / 60));
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+
+  if (hours <= 0) {
+    return `${minutes}min`;
+  }
+
+  if (minutes === 0) {
+    return `${hours}h`;
+  }
+
+  return `${hours}h ${minutes}min`;
+}
+
+export function formatPriceInBRL(priceInCents: number): string {
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(priceInCents / 100);
 }
 
 export function BookingSummary({
