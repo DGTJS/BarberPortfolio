@@ -200,14 +200,14 @@ export const ServiceItem = ({ service, barberShop }: ServiceItemProps) => {
           side="right"
           className="flex w-[370px] flex-col gap-0 overflow-y-auto  p-0 [&::-webkit-scrollbar]:hidden"
         >
-          <div className="flex h-full flex-col gap-6 py-6">
-            <SheetHeader className="flex-row items-center justify-between py-5 px-5">
+          <div className="flex h-full flex-col gap-6 py-2.5">
+            <SheetHeader className="flex-row items-center border-b border-muted-foreground/20 justify-between py-5 px-5">
               <SheetTitle className="text-[18px] leading-[1.4]">
                 Fazer Reserva
               </SheetTitle>
             </SheetHeader>
 
-            <div className="px-5">
+            <div className="px-2">
               <div>
                 <Calendar
                   mode="single"
@@ -227,7 +227,7 @@ export const ServiceItem = ({ service, barberShop }: ServiceItemProps) => {
                   classNames={{
                     root: "w-full",
                     months: "w-full",
-                    month: "w-full grid grid-cols-[2fr_1fr] gap-x-4 gap-y-2",
+                    month: "w-full grid grid-cols-[2fr_1fr]",
                     month_caption: "w-full items-center",
                     month_grid: "w-full col-span-2",
                     table: "w-full",
@@ -236,14 +236,16 @@ export const ServiceItem = ({ service, barberShop }: ServiceItemProps) => {
                     nav: "shrink-0 flex items-center w-full justify-end gap-2",
                     caption_label:
                       "flex-1 text-[16px] font-bold text-foreground",
-                    button_previous: "h-8 w-8 rounded-[8px] p-0",
-                    button_next: "h-8 w-8 rounded-[8px] p-0",
+                    button_previous:
+                      "flex h-8 w-8 rounded-[8px] border border-muted-foreground/20 p-0 transition hover:bg-primary hover:text-primary-foreground justify-center items-center",
+                    button_next:
+                      " flex h-8 w-8 rounded-[8px] p-0 border justify-center bg-muted-foreground/50 text-foreground items-center transition hover:bg-primary hover:text-primary-foreground",
                     day: "group/day relative flex-1 p-0 text-center select-none",
                   }}
                 />
               </div>
             </div>
-            <Separator className="my-2" />
+            <Separator className="bg-muted-foreground/20" />
 
             {bookingDraft?.date && (
               <div className="px-5">
@@ -256,7 +258,7 @@ export const ServiceItem = ({ service, barberShop }: ServiceItemProps) => {
                         variant={
                           bookingDraft.time === time ? "default" : "outline"
                         }
-                        className="h-auto rounded-full px-4 py-2"
+                        className="h-auto rounded-full px-4 py-2 border-accent-foreground"
                         onClick={() => handleSelectTime(time)}
                       >
                         {time}
@@ -266,10 +268,10 @@ export const ServiceItem = ({ service, barberShop }: ServiceItemProps) => {
                 </div>
               </div>
             )}
-            <Separator className="my-2" />
+            <Separator className="bg-muted-foreground/20" />
             {bookingDraft?.time && bookingDraft.date && (
               <div className="px-5">
-                <div className="w-full rounded-[10px] border border-border bg-secondary p-3">
+                <div className="w-full rounded-[10px] border border-border bg-muted-foreground/25 p-3">
                   <div className="flex items-center justify-between">
                     <span className="text-[16px] font-bold leading-[1.4] text-foreground">
                       {bookingDraft.service.name}
