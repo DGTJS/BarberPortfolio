@@ -13,7 +13,7 @@ export const Header = () => {
 
   return (
     <>
-      <header className="flex justify-between items-center py-4 px-5 ">
+      <header className="flex justify-between items-center pt-4 px-5 ">
         <Image src="/Logo.png" alt="BarberShop" width={100} height={100} />
         <Button
           variant={"ghost"}

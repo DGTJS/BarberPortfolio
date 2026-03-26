@@ -103,7 +103,11 @@ const BarberShopPage = async (props: PageProps) => {
 
           {/* Services Section */}
           {barberShop.services.map((service) => (
-            <ServiceItem key={service.id} service={service} />
+            <ServiceItem
+              key={service.id}
+              service={service}
+              barberShop={{ id: barberShop.id, name: barberShop.name }}
+            />
           ))}
 
           <Separator className="my-6" />

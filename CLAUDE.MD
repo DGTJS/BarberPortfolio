@@ -1,1 +1,1 @@
-Use as regras que estão em @.cursor/rules.
+Use as regras que estão em @prompts/project.md
