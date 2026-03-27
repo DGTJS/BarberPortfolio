@@ -23,7 +23,6 @@ import {
   getDefaultServiceDurationInSeconds,
 } from "@/app/_utils/format";
 import { createBookingCheckoutAction } from "@/app/_actions/create-booking-checkout";
-import { createBookingAction } from "@/app/_actions/create-booking";
 import { useAction } from "next-safe-action/hooks";
 import { getDataAvailbleTimeSlots } from "@/app/_actions/get-date-available-time-slots";
 import { useQuery } from "@tanstack/react-query";
@@ -41,10 +40,9 @@ export const ServiceItem = ({ service, barberShop }: ServiceItemProps) => {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  const { executeAsync: executeCheckoutAsync } = useAction(
+  const { executeAsync: executeCreateBookingCheckoutSession } = useAction(
     createBookingCheckoutAction,
   );
-  const { executeAsync } = useAction(createBookingAction);
   const { data: availableTimeSlots } = useQuery({
     queryKey: ["data-available-time-slots", service.barbershopId, selectedDate],
     queryFn: () =>
@@ -99,7 +97,7 @@ export const ServiceItem = ({ service, barberShop }: ServiceItemProps) => {
     date.setHours(Number(hour));
     date.setMinutes(Number(minute));
 
-    const checkoutSessionResult = await executeCheckoutAsync({
+    const checkoutSessionResult = await executeCreateBookingCheckoutSession({
       serviceId: service.id,
       date,
     });
@@ -112,20 +110,9 @@ export const ServiceItem = ({ service, barberShop }: ServiceItemProps) => {
       return;
     }
 
-    const result = await executeAsync({
-      serviceId: service.id,
-      date,
-    });
-
-    if (result.validationErrors?._errors?.[0]) {
-      toast.error("Horario indisponível");
-      return;
-    }
     if (checkoutSessionResult.data?.url) {
       redirect(checkoutSessionResult.data.url);
     }
-    toast.success("Horário agendado com sucesso");
-    setIsSheetOpen(false);
   };
 
   return (
