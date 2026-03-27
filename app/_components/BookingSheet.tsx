@@ -1,13 +1,23 @@
 "use client";
 
+import { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "./ui/sheet";
 import { Button } from "./ui/button";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "./ui/alert-dialog";
 import { cancelBookingAction } from "@/app/_actions/cancel-booking";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useAction } from "next-safe-action/hooks";
-import { Smartphone } from "lucide-react";
-import { CopyToClipboardButton } from "./CopyToClipboardButton";
+import { ContactInfo } from "./ContactInfo";
 import { Badge } from "./ui/badge";
 
 interface BookingSheetProps {
@@ -35,6 +45,7 @@ export const BookingSheet = ({
   onOpenChange,
   booking,
 }: BookingSheetProps) => {
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const router = useRouter();
   const { execute, status } = useAction(cancelBookingAction, {
     onSuccess: () => {
@@ -169,50 +180,36 @@ export const BookingSheet = ({
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-sm font-[family-name:var(--font-sans)] text-[#656565]">
+                <span className="text-sm font-[family-name:var(--font-sans)] text-muted-foreground">
                   Data
                 </span>
-                <span className="text-sm font-[family-name:var(--font-sans)] text-[#656565]">
+                <span className="text-sm font-[family-name:var(--font-sans)] text-muted-foreground">
                   {formatDate(bookingDate)}
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-sm font-[family-name:var(--font-sans)] text-[#656565]">
+                <span className="text-sm font-[family-name:var(--font-sans)] text-muted-foreground">
                   Horário
                 </span>
-                <span className="text-sm font-[family-name:var(--font-sans)] text-[#656565]">
+                <span className="text-sm font-[family-name:var(--font-sans)] text-muted-foreground">
                   {formatTime(bookingDate)}
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-sm font-[family-name:var(--font-sans)] text-[#656565]">
+                <span className="text-sm font-[family-name:var(--font-sans)] text-muted-foreground">
                   Barbearia
                 </span>
-                <span className="text-sm font-[family-name:var(--font-sans)] text-[#656565]">
+                <span className="text-sm font-[family-name:var(--font-sans)] text-muted-foreground">
                   {booking.barbershop.name}
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Contact Info */}
-          <div className="flex flex-col gap-3 px-5">
-            {booking.barbershop.phones?.map((phone, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between gap-2.5"
-              >
-                <div className="flex items-center gap-2.5">
-                  <Smartphone className="w-6 h-6" />
-                  <span className="text-sm font-[family-name:var(--font-sans)] text-foreground">
-                    {phone}
-                  </span>
-                </div>
-                <CopyToClipboardButton text={phone} />
-              </div>
-            ))}
+          <div className="px-5">
+            <ContactInfo phones={booking.barbershop.phones} />
           </div>
         </div>
 
@@ -227,18 +224,38 @@ export const BookingSheet = ({
           </Button>
           {currentStatus === "confirmed" && (
             <Button
-              onClick={() => execute({ bookingId: booking.id })}
-              disabled={status === "executing"}
-              className="flex-1 px-4 py-2 rounded-full font-bold text-sm font-[family-name:var(--font-sans)]"
-              style={{
-                backgroundColor: "#9C2729",
-                color: "#FFFFFF",
-              }}
+              onClick={() => setCancelDialogOpen(true)}
+              className="flex-1 px-4 py-2 rounded-full font-bold text-sm font-[family-name:var(--font-sans)] bg-destructive text-destructive-foreground hover:bg-destructive/60"
             >
-              {status === "executing" ? "Cancelando..." : "Cancelar Reserva"}
+              Cancelar Reserva
             </Button>
           )}
         </div>
+
+        <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+          <AlertDialogContent className="max-w-[340px] rounded-[16px] ">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-lg font-bold font-[family-name:var(--font-sans)]">
+                Cancelar Reserva
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-sm text-muted-foreground font-[family-name:var(--font-sans)]">
+                Tem certeza que deseja cancelar este agendamento?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="flex-row gap-3 sm:gap-3">
+              <AlertDialogCancel className="flex-1 rounded-full border border-border font-bold text-sm font-[family-name:var(--font-sans)]">
+                Voltar
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => execute({ bookingId: booking.id })}
+                disabled={status === "executing"}
+                className="flex-1 rounded-full font-bold text-sm font-[family-name:var(--font-sans)] bg-destructive text-destructive-foreground hover:bg-destructive/40 cursor-pointer"
+              >
+                {status === "executing" ? "Cancelando..." : "Confirmar"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </SheetContent>
     </Sheet>
   );

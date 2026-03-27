@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Button } from "@/app/_components/ui/button";
 import { MenuIcon } from "lucide-react";
 import { MenuSheet } from "./MenuSheet";
+import { ModeToggle } from "./ModeToggle";
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import Logo from "@/public/Logo.png";
@@ -27,13 +28,16 @@ export const Header = () => {
           <Image src={Logo} alt="BarberShop" width={92} height={24} />
         </Link>
 
-        <Button
-          variant={"ghost"}
-          className="w-12 h-12 rounded-full"
-          onClick={() => setIsMenuOpen(true)}
-        >
-          <MenuIcon className="w-6 h-6" />
-        </Button>
+        <div className="flex items-center gap-1">
+          <ModeToggle />
+          <Button
+            variant={"ghost"}
+            className="w-12 h-12 rounded-full"
+            onClick={() => setIsMenuOpen(true)}
+          >
+            <MenuIcon className="w-6 h-6" />
+          </Button>
+        </div>
       </header>
       <MenuSheet
         open={isMenuOpen}

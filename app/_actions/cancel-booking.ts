@@ -4,6 +4,7 @@ import { z } from "zod";
 import { actionClient } from "@/lib/action-client";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import Stripe from "stripe";
 
 const inputSchema = z.object({
   bookingId: z.uuid(),
@@ -29,6 +30,13 @@ export const cancelBookingAction = actionClient
 
     if (!booking) {
       throw new Error("Agendamento não encontrado");
+    }
+
+    if (booking.stripeChargeId) {
+      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+      await stripe.refunds.create({
+        charge: booking.stripeChargeId,
+      });
     }
 
     const updatedBooking = await prisma.booking.update({

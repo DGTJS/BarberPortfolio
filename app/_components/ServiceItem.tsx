@@ -205,10 +205,9 @@ export const ServiceItem = ({ service, barberShop }: ServiceItemProps) => {
               selectedTime={selectedTime}
               onSelectTime={setSelectedTime}
               isVisible={!!selectedDate}
+              selectedDate={selectedDate}
               availableTimeSlots={availableTimeSlots}
             />
-
-            <Separator className="bg-muted-foreground/20" />
 
             {selectedTime && selectedDate && (
               <BookingSummary

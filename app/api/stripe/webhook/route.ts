@@ -27,6 +27,22 @@ export const POST = async (req: Request) => {
       return NextResponse.error();
     }
 
+    const paymentIntentId =
+      typeof session.payment_intent === "string"
+        ? session.payment_intent
+        : session.payment_intent?.id;
+
+    let stripeChargeId: string | undefined;
+    if (paymentIntentId) {
+      const paymentIntent = await stripe.paymentIntents.retrieve(
+        paymentIntentId,
+      );
+      stripeChargeId =
+        typeof paymentIntent.latest_charge === "string"
+          ? paymentIntent.latest_charge
+          : paymentIntent.latest_charge?.id;
+    }
+
     const bookingDate = new Date(date);
     const existingBooking = await prisma.booking.findFirst({
       where: {
@@ -43,6 +59,7 @@ export const POST = async (req: Request) => {
           barbershopId,
           userId,
           date: bookingDate,
+          stripeChargeId: stripeChargeId ?? null,
         },
       });
     }

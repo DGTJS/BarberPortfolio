@@ -13,29 +13,61 @@ import {
 } from "./_components/ui/page";
 
 import { prisma } from "@/lib/prisma";
+import { getUserBookingsAction } from "@/app/_actions/get-user-bookings";
 
 export default async function Home() {
-  const barberShops = await prisma.barberShop.findMany();
+  const [barberShops, bookingsResult] = await Promise.all([
+    prisma.barberShop.findMany(),
+    getUserBookingsAction(),
+  ]);
+
+  const bookings = bookingsResult?.data ?? [];
+  const now = new Date();
+
+  const confirmedBookings = bookings
+    .filter((b) => !b.canceled && new Date(b.date) > now)
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+  const lastBooking = confirmedBookings[0] ?? bookings.find((b) => !b.canceled && new Date(b.date) <= now) ?? null;
+
+  const getBookingStatus = (
+    booking: NonNullable<typeof lastBooking>,
+  ): "confirmed" | "finished" | "canceled" => {
+    if (booking.canceled) return "canceled";
+    if (new Date(booking.date) > new Date()) return "confirmed";
+    return "finished";
+  };
+
   return (
     <>
       <Header />
       <PageContainer>
-        <SearchInputs />
-        <Image
-          src={Banner}
-          alt="Agendar Agora!"
-          sizes="100vw"
-          className="h-auto w-full "
-        />
-        <PageSection>
-          <PageSectionTitle>Agendamentos</PageSectionTitle>
-          <BookingItem
-            serviceName="Corte de Cabelo"
-            barberShopName="Barbearia do João"
-            barberShopImage="https://utfs.io/f/c97a2dc9-cf62-468b-a851-bfd2bdde775f-16p.png"
-            date={new Date()}
+        <div className="flex flex-col gap-4">
+          <SearchInputs />
+          <Image
+            src={Banner}
+            alt="Agendar Agora!"
+            sizes="100vw"
+            className="h-auto w-full "
           />
-        </PageSection>
+        </div>
+        {lastBooking && (
+          <PageSection>
+            <PageSectionTitle>Agendamentos</PageSectionTitle>
+            <BookingItem
+              id={lastBooking.id}
+              serviceName={lastBooking.service.name}
+              barberShopName={lastBooking.barbershop.name}
+              barberShopImage={lastBooking.barbershop.imageUrl}
+              barberShopAddress={lastBooking.barbershop.address}
+              barberShopPhones={lastBooking.barbershop.phones}
+              servicePriceInCents={lastBooking.service.priceInCents}
+              date={new Date(lastBooking.date)}
+              canceled={lastBooking.canceled}
+              status={getBookingStatus(lastBooking)}
+            />
+          </PageSection>
+        )}
         <PageSection>
           <PageSectionTitle>Barbearias</PageSectionTitle>
           <PageSectionScroller>

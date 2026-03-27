@@ -53,9 +53,9 @@ export default async function BookingsPage() {
   };
 
   return (
-    <>
+    <main className="h-screen flex flex-col min-h-screen">
       <Header />
-      <PageContainer>
+      <PageContainer className="flex-1">
         <PageSection>
           <PageSectionTitle>Agendamentos Confirmados</PageSectionTitle>
           {confirmedBookings.length === 0 ? (
@@ -111,6 +111,6 @@ export default async function BookingsPage() {
         </PageSection>
       </PageContainer>
       <Footer />
-    </>
+    </main>
   );
 }

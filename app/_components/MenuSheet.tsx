@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Sheet,
   SheetClose,
@@ -14,9 +15,10 @@ import {
   AvatarImage,
 } from "@/app/_components/ui/avatar";
 import { Button } from "@/app/_components/ui/button";
-import { X, House, CalendarDays, LogOut, Scissors, User } from "lucide-react";
+import { X, House, CalendarDays, LogOut, User } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { Separator } from "@/app/_components/ui/separator";
+import { CategoryList } from "@/app/_components/CategoryList";
 
 interface MenuSheetProps {
   open: boolean;
@@ -24,26 +26,19 @@ interface MenuSheetProps {
   isLoading: boolean;
 }
 
-interface Category {
-  name: string;
-  icon: typeof Scissors;
-}
-
-const categories: Category[] = [
-  { name: "Cabelo", icon: Scissors },
-  { name: "Barba", icon: Scissors },
-  { name: "Acabamento", icon: Scissors },
-  { name: "Sombrancelha", icon: Scissors },
-  { name: "Massagem", icon: Scissors },
-  { name: "Hidratação", icon: Scissors },
-];
-
 export function MenuSheet({ open, onOpenChange, isLoading }: MenuSheetProps) {
   const { data: session } = authClient.useSession();
+  const router = useRouter();
+
   const handleLogin = async () => {
     await authClient.signIn.social({
       provider: "google",
     });
+  };
+
+  const handleCategorySelect = (search: string) => {
+    onOpenChange(false);
+    router.push(`/barbershops?search=${encodeURIComponent(search)}`);
   };
 
   const isLoggedIn = !!session;
@@ -55,7 +50,6 @@ export function MenuSheet({ open, onOpenChange, isLoading }: MenuSheetProps) {
         className="w-[370px] p-0 [&::-webkit-scrollbar]:hidden"
         showCloseButton={false}
       >
-        {/* Botão X customizado com animação */}
         <SheetClose
           className="absolute top-4 right-4 z-50 p-2 rounded-full bg-muted/50 hover:bg-muted transition-all duration-200 hover:scale-110 active:scale-95 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
           asChild
@@ -76,7 +70,6 @@ export function MenuSheet({ open, onOpenChange, isLoading }: MenuSheetProps) {
         </SheetHeader>
 
         <div className="flex flex-col gap-6 px-6 py-6">
-          {/* User Info */}
           {isLoading ? (
             <div className="flex items-center gap-3">
               <div className="size-12 rounded-full bg-muted animate-pulse" />
@@ -117,7 +110,6 @@ export function MenuSheet({ open, onOpenChange, isLoading }: MenuSheetProps) {
             </div>
           )}
 
-          {/* Navigation Buttons */}
           <div className="flex flex-col gap-1">
             <Button
               variant="ghost"
@@ -142,22 +134,9 @@ export function MenuSheet({ open, onOpenChange, isLoading }: MenuSheetProps) {
           </div>
           <Separator />
 
-          {/* Categories */}
-          <div className="flex flex-col gap-1">
-            {categories.map((category) => (
-              <Button
-                key={category.name}
-                variant="ghost"
-                className="justify-start rounded-full px-5 py-3 h-10 hover:bg-muted/50 transition-colors"
-                asChild
-              >
-                <span className="text-sm font-medium">{category.name}</span>
-              </Button>
-            ))}
-          </div>
+          <CategoryList variant="links" onSelect={handleCategorySelect} />
           <Separator className="my-4" />
 
-          {/* Logout Button */}
           {isLoggedIn && (
             <Button
               variant="ghost"
