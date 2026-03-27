@@ -9,7 +9,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/app/_components/ui/sheet";
-import { Separator } from "./separator";
+import { Separator } from "./ui/separator";
 import { TimeSlotsSelector } from "@/app/_components/TimeSlotsSelector";
 import { BookingSummary } from "@/app/_components/BookingSummary";
 import Image from "next/image";
@@ -27,6 +27,7 @@ import { createBookingAction } from "@/app/_actions/create-booking";
 import { useAction } from "next-safe-action/hooks";
 import { getDataAvailbleTimeSlots } from "@/app/_actions/get-date-available-time-slots";
 import { useQuery } from "@tanstack/react-query";
+import { redirect } from "next/navigation";
 
 interface ServiceItemProps {
   service: BarberShopService;
@@ -121,7 +122,7 @@ export const ServiceItem = ({ service, barberShop }: ServiceItemProps) => {
       return;
     }
     if (checkoutSessionResult.data?.url) {
-      window.location.href = checkoutSessionResult.data.url;
+      redirect(checkoutSessionResult.data.url);
     }
     toast.success("Horário agendado com sucesso");
     setIsSheetOpen(false);

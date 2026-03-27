@@ -7,6 +7,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { returnValidationErrors } from "next-safe-action";
 import { prisma } from "@/lib/prisma";
+import { format } from "date-fns";
 
 const inputSchema = z.object({
   serviceId: z.uuid(),
@@ -35,9 +36,9 @@ export const createBookingCheckoutAction = actionClient
       },
     });
 
-    const barberShopService = await prisma.barberShopService.findUnique({
+    const barberShop = await prisma.barberShop.findUnique({
       where: {
-        id: serviceId,
+        id: service?.barbershopId,
       },
     });
 
@@ -56,7 +57,7 @@ export const createBookingCheckoutAction = actionClient
             currency: "brl",
             unit_amount: service?.priceInCents,
             product_data: {
-              name: `${service?.name || ""} - ${barberShopService?.name || ""}`,
+              name: `${barberShop?.name || ""} - ${service?.name || ""}  - Em ${format(date, "dd/MM/yyyy HH:mm")}`,
               description: `${service?.description || ""}`,
               images: [service?.imageUrl || ""],
             },

@@ -22,7 +22,8 @@ Tecnologias utilizadas:
 - Use a página que está em @app/page.tsx como referência para criar e organizar o código.
 - **SEMPRE** use o MCP do Context7 para buscar documentações, sites e APIs
 - **SEMPRE** use os componentes @app/\_components/footer.tsx e @app/\_components/header.tsx na hora de criar headers e footers. **NUNCA** os crie manualmente.
-- Evite ao máximo duplicidade de código. Ao repetir um código, crie componentes e/ou funções utilitárias.
+- Evite ao máximo duplicidade de código. Ao repetir um código, crie componentes e/ou funções utilitárias em @app/\_components.
+- **SEMPRE** faça os componentes e/ou funções utilitárias em @app/\_components.
 - Ao usar Figma MCP, **SEMPRE** seja 100% fiel ao Figma **CUSTE O QUE CUSTAR**.
 - Todo scroll horizontal **DEVE SEMPRE** esconder a barra de scroll usando className="[&::-webkit-scrollbar]:hidden"
 
@@ -45,3 +46,10 @@ Tecnologias utilizadas:
 ## Figma MCP
 
 - **NUNCA** faça downloads de ícones do Figma, **SEMPRE** use a biblioteca lucide-react para renderizar ícones.
+
+## Redirects
+
+- **SEMPRE** use a biblioteca "next/navigation" para redirecionar.
+- **NUNCA** use o método window.location.href para redirecionar.
+- **NUNCA** use o método response.redirect para redirecionar.
+-

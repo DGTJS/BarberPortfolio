@@ -14,6 +14,8 @@ const inputSchema = z.object({
   date: z.date(),
 });
 
+const TIME_SLOT = [...buildTimeSlots()];
+
 export const getDataAvailbleTimeSlots = actionClient
   .inputSchema(inputSchema)
   .action(async ({ parsedInput: { barberShopId, date } }) => {
@@ -37,7 +39,7 @@ export const getDataAvailbleTimeSlots = actionClient
     const occupiedSlots = booking.map((booking) =>
       format(booking.date, "HH:mm"),
     );
-    const availableSlots = buildTimeSlots().filter(
+    const availableSlots = TIME_SLOT.filter(
       (slot) => !occupiedSlots.includes(slot),
     );
     return availableSlots;

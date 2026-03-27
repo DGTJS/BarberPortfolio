@@ -5,7 +5,7 @@ import {
   CopyButton,
 } from "@/app/_components/ui/page";
 import { Separator } from "@/app/_components/ui/separator";
-import { ServiceItem } from "@/app/_components/ui/ServiceItem";
+import { ServiceItem } from "@/app/_components/ServiceItem";
 import { notFound } from "next/navigation";
 import { Button } from "@/app/_components/ui/button";
 import Image from "next/image";
