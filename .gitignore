@@ -11,7 +11,7 @@
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
-.claude/*
+.claude/*                               
 .kilocode/mcp.json
 # testing
 /coverage

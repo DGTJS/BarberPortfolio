@@ -16,16 +16,18 @@ import Image from "next/image";
 import { BarberShopService } from "@prisma/client";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { ptBR, se } from "react-day-picker/locale";
+import { ptBR } from "react-day-picker/locale";
 import {
   formatPriceInBRL,
   capitalizeFirstLetter,
   getDefaultServiceDurationInSeconds,
 } from "@/app/_utils/format";
+import { createBookingCheckoutAction } from "@/app/_actions/create-booking-checkout";
 import { createBookingAction } from "@/app/_actions/create-booking";
 import { useAction } from "next-safe-action/hooks";
 import { getDataAvailbleTimeSlots } from "@/app/_actions/get-date-available-time-slots";
 import { useQuery } from "@tanstack/react-query";
+
 interface ServiceItemProps {
   service: BarberShopService;
   barberShop: {
@@ -38,7 +40,10 @@ export const ServiceItem = ({ service, barberShop }: ServiceItemProps) => {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  const { executeAsync, isPending } = useAction(createBookingAction);
+  const { executeAsync: executeCheckoutAsync } = useAction(
+    createBookingCheckoutAction,
+  );
+  const { executeAsync } = useAction(createBookingAction);
   const { data: availableTimeSlots } = useQuery({
     queryKey: ["data-available-time-slots", service.barbershopId, selectedDate],
     queryFn: () =>
@@ -85,20 +90,40 @@ export const ServiceItem = ({ service, barberShop }: ServiceItemProps) => {
 
   const handleConfirm = async () => {
     if (!selectedDate || !selectedTime) return;
-    const hourSplit = selectedTime!.split(":");
+
+    const hourSplit = selectedTime.split(":");
     const hour = Number(hourSplit[0]);
     const minute = Number(hourSplit[1]);
-    const date = new Date(selectedDate!);
+    const date = new Date(selectedDate);
     date.setHours(Number(hour));
     date.setMinutes(Number(minute));
+
+    const checkoutSessionResult = await executeCheckoutAsync({
+      serviceId: service.id,
+      date,
+    });
+
+    if (
+      checkoutSessionResult.serverError ||
+      checkoutSessionResult.validationErrors
+    ) {
+      toast.error("Erro ao processar pagamento");
+      return;
+    }
+
     const result = await executeAsync({
       serviceId: service.id,
       date,
     });
-    toast.success("Horário agendado com sucesso");
+
     if (result.validationErrors?._errors?.[0]) {
       toast.error("Horario indisponível");
+      return;
     }
+    if (checkoutSessionResult.data?.url) {
+      window.location.href = checkoutSessionResult.data.url;
+    }
+    toast.success("Horário agendado com sucesso");
     setIsSheetOpen(false);
   };
 
