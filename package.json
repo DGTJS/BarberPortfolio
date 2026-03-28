@@ -13,7 +13,9 @@
   },
   "dependencies": {
     "@ai-sdk/google": "2.0.46",
+    "@ai-sdk/groq": "^3.0.31",
     "@ai-sdk/openai": "2.0.85",
+    "@ai-sdk/openai-compatible": "^2.0.37",
     "@ai-sdk/react": "2.0.114",
     "@neondatabase/serverless": "^1.0.2",
     "@prisma/adapter-neon": "^7.1.0",

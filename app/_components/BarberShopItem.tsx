@@ -23,7 +23,7 @@ export const BarberShopItem = ({ barberShop }: BarberShopItemProps) => {
         <p className="text-sidebar-primary-foreground text-lg font-bold">
           {barberShop.name}
         </p>
-        <p className="text-sidebar-primary-foreground text-xs font-light">
+        <p className="text-sidebar-primary-foreground/70 text-[16px] font-light">
           {barberShop.address}
         </p>
       </div>

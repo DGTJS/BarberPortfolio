@@ -20,6 +20,11 @@ export default async function Home() {
     prisma.barberShop.findMany(),
     getUserBookingsAction(),
   ]);
+  const popularBarberShop = await prisma.barberShop.findMany({
+    orderBy: {
+      id: "asc",
+    },
+  });
 
   const bookings = bookingsResult?.data ?? [];
   const now = new Date();
@@ -28,7 +33,10 @@ export default async function Home() {
     .filter((b) => !b.canceled && new Date(b.date) > now)
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-  const lastBooking = confirmedBookings[0] ?? bookings.find((b) => !b.canceled && new Date(b.date) <= now) ?? null;
+  const lastBooking =
+    confirmedBookings[0] ??
+    bookings.find((b) => !b.canceled && new Date(b.date) <= now) ??
+    null;
 
   const getBookingStatus = (
     booking: NonNullable<typeof lastBooking>,
@@ -71,21 +79,17 @@ export default async function Home() {
         <PageSection>
           <PageSectionTitle>Barbearias</PageSectionTitle>
           <PageSectionScroller>
-            {barberShops.map((barberShop) => {
-              return (
-                <BarberShopItem key={barberShop.id} barberShop={barberShop} />
-              );
-            })}
+            {barberShops.map((barberShop) => (
+              <BarberShopItem key={barberShop.id} barberShop={barberShop} />
+            ))}
           </PageSectionScroller>
         </PageSection>
         <PageSection>
           <PageSectionTitle>Populares</PageSectionTitle>
           <PageSectionScroller>
-            {barberShops.map((barberShop) => {
-              return (
-                <BarberShopItem key={barberShop.id} barberShop={barberShop} />
-              );
-            })}
+            {popularBarberShop.map((barberShop) => (
+              <BarberShopItem key={barberShop.id} barberShop={barberShop} />
+            ))}
           </PageSectionScroller>
         </PageSection>
       </PageContainer>

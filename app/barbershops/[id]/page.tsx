@@ -1,8 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import {
-  PageContainer,
-  PageSectionTitle,
-} from "@/app/_components/ui/page";
+import { PageContainer, PageSectionTitle } from "@/app/_components/ui/page";
 import { Separator } from "@/app/_components/ui/separator";
 import { ServiceItem } from "@/app/_components/ServiceItem";
 import { ContactInfo } from "@/app/_components/ContactInfo";
@@ -10,6 +7,7 @@ import { notFound } from "next/navigation";
 import { Button } from "@/app/_components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
+import { Footer } from "@/app/_components/Footer";
 
 interface PageProps {
   params: Promise<{
@@ -119,16 +117,7 @@ const BarberShopPage = async (props: PageProps) => {
           </div>
 
           {/* Footer */}
-          <div className="pt-10">
-            <div className="bg-secondary rounded-[20px] px-6 py-8 space-y-2">
-              <p className="font-semibold text-[12px] text-foreground">
-                © 2025 Copyright Aparatus
-              </p>
-              <p className="text-[12px] text-muted-foreground">
-                Todos os direitos reservados.
-              </p>
-            </div>
-          </div>
+          <Footer />
         </PageContainer>
       </div>
     </div>

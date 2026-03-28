@@ -30,6 +30,7 @@ model BarberShopService {
   imageUrl     String     @default("")
   barbershopId String
   description  String
+  DurationTimeServiceSeconds Int @default(1800)
   barbershop   BarberShop @relation(fields: [barbershopId], references: [id])
   bookings     Booking[]
   

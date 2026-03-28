@@ -54,3 +54,17 @@ export function buildTimeSlots(): string[] {
   }
   return slots;
 }
+
+/**
+ * Formata duração em segundos para texto legível.
+ * @param seconds - Duração em segundos
+ * @returns String formatada (ex: "45 minutos", "1 hora", "1 hora e 30 minutos")
+ */
+export function formatDuration(seconds: number): string {
+  const totalMinutes = Math.round(seconds / 60);
+  if (totalMinutes < 60) return `${totalMinutes} minutos`;
+  const hours = Math.floor(totalMinutes / 60);
+  const mins = totalMinutes % 60;
+  if (mins === 0) return hours === 1 ? "1 hora" : `${hours} horas`;
+  return `${hours} hora${hours > 1 ? "s" : ""} e ${mins} minutos`;
+}
