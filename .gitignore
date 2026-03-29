@@ -5,14 +5,17 @@
 /.pnp
 .pnp.*
 .yarn/*
+.kilocode/*
 .pnpm-store/*
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
-
+.claude/*                               
+.kilocode/mcp.json
 # testing
 /coverage
+
 
 # next.js
 /.next/
@@ -42,3 +45,5 @@ yarn-error.log*
 next-env.d.ts
 
 /app/generated/prisma
+.kilocode/mcp.json
+.kilocode/mcp.json

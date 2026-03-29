@@ -20,6 +20,7 @@ model BarberShop {
   imageUrl    String              @default("")
   phones      String[]
   services    BarberShopService[]
+  bookings    Booking[]
 }
 
 model BarberShopService {
@@ -29,16 +30,24 @@ model BarberShopService {
   imageUrl     String     @default("")
   barbershopId String
   description  String
+  DurationTimeServiceSeconds Int @default(1800)
   barbershop   BarberShop @relation(fields: [barbershopId], references: [id])
+  bookings     Booking[]
+  
 }
 
 model Booking {
   id           String    @id @default(uuid())
   serviceId    String
   barbershopId String
+  barbershop   BarberShop @relation(fields: [barbershopId], references: [id])
+  service      BarberShopService @relation(fields: [serviceId], references: [id])
+  userId       String
+  user         User      @relation(fields: [userId], references: [id])
   date         DateTime  @db.Timestamptz
   canceled     Boolean   @default(false)
   canceledAt   DateTime? @db.Timestamptz
+  stripeChargeId String?
 }
 
 model User {
@@ -51,7 +60,7 @@ model User {
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
-
+  bookings      Booking[]
   @@unique([email])
 }
 

@@ -20,8 +20,10 @@ export const BarberShopItem = ({ barberShop }: BarberShopItemProps) => {
         fill
       />
       <div className="absolute bottom-0 left-0 right-0 z-20 p-4">
-        <p className="text-foreground text-lg font-bold">{barberShop.name}</p>
-        <p className="text-foreground text-xs font-light">
+        <p className="text-sidebar-primary-foreground text-lg font-bold">
+          {barberShop.name}
+        </p>
+        <p className="text-sidebar-primary-foreground/70 text-[16px] font-light">
           {barberShop.address}
         </p>
       </div>

@@ -1,15 +1,13 @@
 import { prisma } from "@/lib/prisma";
-import {
-  PageContainer,
-  PageSectionTitle,
-  CopyButton,
-} from "@/app/_components/ui/page";
+import { PageContainer, PageSectionTitle } from "@/app/_components/ui/page";
 import { Separator } from "@/app/_components/ui/separator";
-import { ServiceItem } from "@/app/_components/ui/ServiceItem";
+import { ServiceItem } from "@/app/_components/ServiceItem";
+import { ContactInfo } from "@/app/_components/ContactInfo";
 import { notFound } from "next/navigation";
 import { Button } from "@/app/_components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
+import { Footer } from "@/app/_components/Footer";
 
 interface PageProps {
   params: Promise<{
@@ -65,93 +63,78 @@ const BarberShopPage = async (props: PageProps) => {
 
       {/* Main Container */}
       <div className="bg-background rounded-tl-[24px] rounded-tr-[24px] -mt-6 relative z-10">
-        <PageContainer>
-          {/* Barber Shop Info */}
-          <div className="flex gap-[5px] items-start">
-            <div className="flex flex-col gap-[4px]">
-              <div className="flex gap-[6px] items-start">
-                {/* Avatar Group - Using barbershop image repeated */}
-                <div className="relative w-[30px] h-[30px] rounded-full overflow-hidden">
-                  <Image
-                    src={barberShop.imageUrl}
-                    alt={barberShop.name}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <h1 className="font-bold text-[20px] text-foreground leading-normal">
-                  {barberShop.name}
-                </h1>
-              </div>
-              <p className="text-[14px] text-muted-foreground leading-[1.4]">
-                {barberShop.address}
-              </p>
-            </div>
-          </div>
-
-          <Separator className="my-6" />
-
-          {/* About Us Section */}
-          <div className="space-y-3">
-            <PageSectionTitle>Sobre Nós</PageSectionTitle>
-            <p className="text-[14px] text-foreground leading-[1.4]">
-              {barberShop.description}
-            </p>
-          </div>
-
-          <Separator className="my-6" />
-
-          {/* Services Section */}
-          {barberShop.services.map((service) => (
-            <ServiceItem
-              key={service.id}
-              service={service}
-              barberShop={{ id: barberShop.id, name: barberShop.name }}
-            />
-          ))}
-
-          <Separator className="my-6" />
-
-          {/* Contact Section */}
-          <div className="space-y-3">
-            <PageSectionTitle>Contato</PageSectionTitle>
-            <div className="space-y-3">
-              {barberShop.phones.map((phone, index) => (
-                <div key={index} className="flex items-center justify-between">
-                  <div className="flex gap-[10px] items-center">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
-                    </svg>
-                    <p className="font-normal text-[14px] text-foreground leading-[1.4]">
-                      {phone}
-                    </p>
+        <PageContainer className="mx-auto max-w-7xl">
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* Left Column: Info + Services */}
+            <div className="flex-1">
+              {/* Barber Shop Info */}
+              <div className="flex gap-[5px] items-start">
+                <div className="flex flex-col gap-[4px]">
+                  <div className="flex gap-[6px] items-start">
+                    <div className="relative w-[30px] h-[30px] rounded-full overflow-hidden">
+                      <Image
+                        src={barberShop.imageUrl}
+                        alt={barberShop.name}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <h1 className="font-bold text-[20px] text-foreground leading-normal">
+                      {barberShop.name}
+                    </h1>
                   </div>
-                  <CopyButton text={phone} />
+                  <p className="text-[14px] text-muted-foreground leading-[1.4]">
+                    {barberShop.address}
+                  </p>
                 </div>
-              ))}
+              </div>
+
+              <Separator className="my-6" />
+
+              {/* About Us Section */}
+              <div className="space-y-3">
+                <PageSectionTitle>Sobre Nós</PageSectionTitle>
+                <p className="text-[14px] text-foreground leading-[1.4]">
+                  {barberShop.description}
+                </p>
+              </div>
+
+              <Separator className="my-6" />
+
+              {/* Services Section */}
+              <div className="space-y-4">
+                <PageSectionTitle>Serviços</PageSectionTitle>
+                {barberShop.services.map((service) => (
+                  <ServiceItem
+                    key={service.id}
+                    service={service}
+                    barberShop={{ id: barberShop.id, name: barberShop.name }}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Right Column: Contact + Footer (Desktop only) */}
+            <div className="hidden lg:block lg:w-[300px] lg:shrink-0">
+              <div className="sticky top-8 space-y-6">
+                <div className="space-y-3">
+                  <PageSectionTitle>Contato</PageSectionTitle>
+                  <ContactInfo phones={barberShop.phones} />
+                </div>
+                <Separator />
+                <Footer />
+              </div>
             </div>
           </div>
 
-          {/* Footer */}
-          <div className="pt-10">
-            <div className="bg-secondary rounded-[20px] px-6 py-8 space-y-2">
-              <p className="font-semibold text-[12px] text-foreground">
-                © 2025 Copyright Aparatus
-              </p>
-              <p className="text-[12px] text-muted-foreground">
-                Todos os direitos reservados.
-              </p>
+          {/* Contact + Footer (Mobile only) */}
+          <div className="lg:hidden">
+            <Separator className="my-6" />
+            <div className="space-y-3">
+              <PageSectionTitle>Contato</PageSectionTitle>
+              <ContactInfo phones={barberShop.phones} />
             </div>
+            <Footer />
           </div>
         </PageContainer>
       </div>
