@@ -18,7 +18,6 @@ export default async function BookingsPage() {
             </p>
           </PageContainer>
         </div>
-        <Footer />
       </>
     );
   }
@@ -48,7 +47,6 @@ export default async function BookingsPage() {
           <BookingsContent bookings={bookings} />
         </PageContainer>
       </main>
-      <Footer />
     </>
   );
 }

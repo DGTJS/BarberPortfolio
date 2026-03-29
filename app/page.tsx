@@ -192,7 +192,6 @@ export default async function Home() {
             </SectionScrollerWithArrows>
           </PageSection>
         </PageContainer>
-        <Footer />
       </div>
 
       <ChatButton />

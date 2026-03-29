@@ -38,9 +38,7 @@ export default async function BarbershopsPage({
       <PageContainer>
         <PageSection>
           <PageSectionTitle>
-            {search
-              ? `Resultados para "${search}"`
-              : "Barbearias"}
+            {search ? `Resultados para "${search}"` : "Barbearias"}
           </PageSectionTitle>
           {barbershops.length === 0 ? (
             <p className="text-muted-foreground">
@@ -55,7 +53,6 @@ export default async function BarbershopsPage({
           )}
         </PageSection>
       </PageContainer>
-      <Footer />
     </>
   );
 }
