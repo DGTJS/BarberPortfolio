@@ -13,8 +13,11 @@ export function ModeToggle() {
       className="w-12 h-12 rounded-full"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
     >
-      <Sun className="h-6 w-6 dark:hidden" />
-      <Moon className="h-6 w-6 hidden dark:block" />
+      {theme === "dark" ? (
+        <Moon className="h-6 w-6" />
+      ) : (
+        <Sun className="h-6 w-6" />
+      )}
     </Button>
   );
 }
