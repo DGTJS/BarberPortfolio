@@ -122,7 +122,6 @@ const BarberShopPage = async (props: PageProps) => {
                   <ContactInfo phones={barberShop.phones} />
                 </div>
                 <Separator />
-                <Footer />
               </div>
             </div>
           </div>
@@ -134,7 +133,6 @@ const BarberShopPage = async (props: PageProps) => {
               <PageSectionTitle>Contato</PageSectionTitle>
               <ContactInfo phones={barberShop.phones} />
             </div>
-            <Footer />
           </div>
         </PageContainer>
       </div>

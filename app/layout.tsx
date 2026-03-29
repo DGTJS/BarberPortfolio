@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "sonner";
 import QueryProvider from "./_providers/query-provider";
 import { ThemeProvider } from "./_providers/theme-provider";
+import { Footer } from "./_components/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,12 +29,15 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
         <ThemeProvider>
           <Toaster richColors theme="dark" />
-          <QueryProvider>{children}</QueryProvider>
+          <QueryProvider>
+            <main className="flex-1">{children}</main>
+          </QueryProvider>
         </ThemeProvider>
+        <Footer />
       </body>
     </html>
   );
