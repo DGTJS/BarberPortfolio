@@ -30,7 +30,7 @@ export function CategoryList({
           onClick={() => onSelect?.(search)}
           className={cn(
             variant === "buttons"
-              ? "flex items-center gap-3 rounded-full border border-border px-4 py-3 shrink-0 text-foreground hover:bg-accent transition-colors cursor-pointer"
+              ? "flex items-center gap-3 rounded-full border border-border px-4 py-3 shrink-0 text-foreground bg-accent hover:bg-accent/50 transition-colors cursor-pointer"
               : "flex items-center gap-3 rounded-full px-5 py-3 h-10 text-foreground hover:bg-muted/50 transition-colors text-sm font-medium cursor-pointer",
           )}
         >

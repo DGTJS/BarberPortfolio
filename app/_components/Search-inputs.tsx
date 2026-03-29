@@ -7,7 +7,15 @@ import { Button } from "@/app/_components/ui/button";
 import { SearchIcon } from "lucide-react";
 import { CategoryList } from "./CategoryList";
 
-export const SearchInputs = () => {
+interface SearchInputsProps {
+  className?: string;
+  showCategories?: boolean;
+}
+
+export const SearchInputs = ({
+  className,
+  showCategories = true,
+}: SearchInputsProps) => {
   const [search, setSearch] = useState("");
   const router = useRouter();
 
@@ -22,11 +30,11 @@ export const SearchInputs = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className={`flex flex-col gap-4 ${className || ""}`}>
       <form onSubmit={handleSubmit} className="flex items-center gap-2">
         <Input
           placeholder="Pesquise serviços ou barbearias"
-          className="!bg-transparent px-3 !py-5 rounded-full"
+          className="!xl:!bg-foreground/50  px-3 !py-5 rounded-full xl:!placeholder:text-muted xl:!border-muted/50"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -38,7 +46,9 @@ export const SearchInputs = () => {
           <SearchIcon className="w-5 h-5" />
         </Button>
       </form>
-      <CategoryList variant="buttons" onSelect={handleQuickSearch} />
+      {showCategories && (
+        <CategoryList variant="buttons" onSelect={handleQuickSearch} />
+      )}
     </div>
   );
 };

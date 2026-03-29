@@ -29,10 +29,6 @@ export const ChatMessage = ({ message }: { message: UIMessage }) => {
     (part) => part.type === "text",
   );
 
-  const toolParts = message.parts.filter(
-    (part) => part.type === "tool-result",
-  );
-
   const hasContent = textParts.length > 0;
 
   if (!hasContent) return null;
@@ -45,8 +41,11 @@ export const ChatMessage = ({ message }: { message: UIMessage }) => {
       <div className="flex-1 pt-1 text-sm leading-relaxed text-foreground">
         {textParts.map((part, i) => {
           let text = part.text;
-          // Remove tool call JSON from displayed text
-          text = text.replace(/CALL>\{[^}]*\}/g, "").trim();
+          text = text
+            .replace(/tool_\w+\.\w+\([^)]*\)/g, "")
+            .replace(/CALL>\{[^}]*\}/g, "")
+            .replace(/get_available_time_slots\([^)]*\)/g, "")
+            .trim();
           if (!text) return null;
           return (
             <Streamdown key={`${message.id}-${i}`}>{text}</Streamdown>

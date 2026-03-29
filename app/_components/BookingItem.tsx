@@ -5,6 +5,7 @@ import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { BookingSheet } from "./BookingSheet";
+import { cn } from "@/lib/utils";
 
 interface BookingItemProps {
   id: string;
@@ -17,6 +18,8 @@ interface BookingItemProps {
   date: Date;
   canceled: boolean;
   status: "confirmed" | "finished" | "canceled";
+  isSelected?: boolean;
+  onSelect?: () => void;
 }
 
 export const BookingItem = ({
@@ -30,6 +33,8 @@ export const BookingItem = ({
   date,
   canceled,
   status,
+  isSelected = false,
+  onSelect,
 }: BookingItemProps) => {
   const [sheetOpen, setSheetOpen] = useState(false);
 
@@ -50,10 +55,22 @@ export const BookingItem = ({
     }
   };
 
+  const handleClick = () => {
+    if (onSelect) {
+      onSelect();
+    }
+    setSheetOpen(true);
+  };
+
   return (
     <>
-      <div onClick={() => setSheetOpen(true)} className="cursor-pointer">
-        <Card className="flex flex-row items-center justify-between w-full h-full min-w-full p-0">
+      <div onClick={handleClick} className="cursor-pointer">
+        <Card
+          className={cn(
+            "flex flex-row items-center justify-between w-full h-full min-w-full p-0 transition-colors",
+            isSelected && "ring-2 ring-primary",
+          )}
+        >
           {/* {ESQUERDA} */}
           <div className="flex flex-col gap-4 p-4">
             {getStatusBadge()}

@@ -1,7 +1,7 @@
 export const Footer = () => {
   return (
-    <footer className=" p-7">
-      <p className="text-foreground font-semibold text-xs">
+    <footer className="max-w-7xl mx-auto p-4">
+      <p className="text-foreground font-semibold text-xs ">
         &copy; {new Date().getFullYear()} Barbearia. Todos os direitos
         reservados.
       </p>

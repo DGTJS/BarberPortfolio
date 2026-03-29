@@ -33,6 +33,7 @@ export function MenuSheet({ open, onOpenChange, isLoading }: MenuSheetProps) {
   const handleLogin = async () => {
     await authClient.signIn.social({
       provider: "google",
+      callbackURL: "/",
     });
   };
 
@@ -126,7 +127,7 @@ export function MenuSheet({ open, onOpenChange, isLoading }: MenuSheetProps) {
               className="justify-start gap-3 rounded-full px-5 py-3 h-auto hover:bg-muted/50 transition-colors"
               asChild
             >
-              <Link href="/bookings">
+              <Link href={isLoggedIn ? "/bookings" : "/login"}>
                 <CalendarDays className="size-4" />
                 <span className="text-sm font-medium">Agendamentos</span>
               </Link>

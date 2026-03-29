@@ -9,6 +9,16 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/app/_components/ui/sheet";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/app/_components/ui/alert-dialog";
 import { Separator } from "./ui/separator";
 import { TimeSlotsSelector } from "@/app/_components/TimeSlotsSelector";
 import { BookingSummary } from "@/app/_components/BookingSummary";
@@ -26,7 +36,8 @@ import { createBookingCheckoutAction } from "@/app/_actions/create-booking-check
 import { useAction } from "next-safe-action/hooks";
 import { getDataAvailbleTimeSlots } from "@/app/_actions/get-date-available-time-slots";
 import { useQuery } from "@tanstack/react-query";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
 
 interface ServiceItemProps {
   service: BarberShopService;
@@ -40,9 +51,12 @@ export const ServiceItem = ({ service, barberShop }: ServiceItemProps) => {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [loginDialogOpen, setLoginDialogOpen] = useState(false);
+  const router = useRouter();
   const { executeAsync: executeCreateBookingCheckoutSession } = useAction(
     createBookingCheckoutAction,
   );
+  const { data: session } = authClient.useSession();
   const { data: availableTimeSlots } = useQuery({
     queryKey: ["data-available-time-slots", service.barbershopId, selectedDate],
     queryFn: () =>
@@ -90,6 +104,11 @@ export const ServiceItem = ({ service, barberShop }: ServiceItemProps) => {
   const handleConfirm = async () => {
     if (!selectedDate || !selectedTime) return;
 
+    if (!session?.user) {
+      setLoginDialogOpen(true);
+      return;
+    }
+
     const hourSplit = selectedTime.split(":");
     const hour = Number(hourSplit[0]);
     const minute = Number(hourSplit[1]);
@@ -113,6 +132,10 @@ export const ServiceItem = ({ service, barberShop }: ServiceItemProps) => {
     if (checkoutSessionResult.data?.url) {
       redirect(checkoutSessionResult.data.url);
     }
+  };
+
+  const handleLogin = () => {
+    router.push("/login");
   };
 
   return (
@@ -236,6 +259,31 @@ export const ServiceItem = ({ service, barberShop }: ServiceItemProps) => {
           </div>
         </SheetContent>
       </Sheet>
+
+      <AlertDialog open={loginDialogOpen} onOpenChange={setLoginDialogOpen}>
+        <AlertDialogContent className="max-w-[340px] rounded-[16px]">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-lg font-bold font-[family-name:var(--font-sans)]">
+              Faça login para continuar
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-sm text-muted-foreground font-[family-name:var(--font-sans)]">
+              Você precisa estar logado para fazer um agendamento. Deseja fazer
+              login agora?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-row gap-3 sm:gap-3">
+            <AlertDialogCancel className="flex-1 rounded-full border border-border font-bold text-sm font-[family-name:var(--font-sans)]">
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleLogin}
+              className="flex-1 rounded-full font-bold text-sm font-[family-name:var(--font-sans)]"
+            >
+              Fazer Login
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };
