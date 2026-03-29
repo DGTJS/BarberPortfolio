@@ -1,8 +1,60 @@
 import type { UIMessage } from "ai";
 import { Bot } from "lucide-react";
-import { Streamdown } from "streamdown";
+import { ChatButtonGroup, type ChatButtonOption } from "./chat-button-group";
+import { ChatBookingCard } from "./chat-booking-card";
 
-export const ChatMessage = ({ message }: { message: UIMessage }) => {
+type ButtonType = "barbershops" | "services" | "dates" | "timeSlots";
+
+interface StructuredToolResult {
+  type: ButtonType;
+  options: ChatButtonOption[];
+}
+
+interface BookingToolResult {
+  type: "booking";
+  barbershopName: string;
+  serviceName: string;
+  date: string;
+  time: string;
+}
+
+function parseToolOutput(output: unknown): StructuredToolResult | BookingToolResult | null {
+  if (typeof output !== "string") return null;
+  try {
+    const parsed = JSON.parse(output);
+    if (
+      parsed &&
+      typeof parsed === "object" &&
+      "type" in parsed &&
+      ["barbershops", "services", "dates", "timeSlots"].includes(parsed.type) &&
+      Array.isArray(parsed.options)
+    ) {
+      return parsed as StructuredToolResult;
+    }
+    if (
+      parsed &&
+      typeof parsed === "object" &&
+      parsed.type === "booking"
+    ) {
+      return parsed as BookingToolResult;
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
+
+interface ChatMessageProps {
+  message: UIMessage;
+  onButtonClick?: (value: string) => void;
+  disabledButtons?: boolean;
+}
+
+export const ChatMessage = ({
+  message,
+  onButtonClick,
+  disabledButtons,
+}: ChatMessageProps) => {
   const isUser = message.role === "user";
 
   if (isUser) {
@@ -29,9 +81,37 @@ export const ChatMessage = ({ message }: { message: UIMessage }) => {
     (part) => part.type === "text",
   );
 
-  const hasContent = textParts.length > 0;
+  const toolParts = message.parts.filter(
+    (part): part is typeof part & { type: string } =>
+      typeof part.type === "string" && part.type.startsWith("tool-"),
+  );
+
+  const hasContent = textParts.length > 0 || toolParts.length > 0;
 
   if (!hasContent) return null;
+
+  const renderButtons = () => {
+    const buttonResults: { type: ButtonType; options: ChatButtonOption[] }[] =
+      [];
+    let bookingResult: BookingToolResult | null = null;
+
+    for (const part of toolParts) {
+      if ("output" in part && part.output !== undefined) {
+        const parsed = parseToolOutput(part.output);
+        if (parsed) {
+          if (parsed.type === "booking") {
+            bookingResult = parsed;
+          } else {
+            buttonResults.push(parsed as { type: ButtonType; options: ChatButtonOption[] });
+          }
+        }
+      }
+    }
+
+    return { buttonResults, bookingResult };
+  };
+
+  const { buttonResults, bookingResult } = renderButtons();
 
   return (
     <div className="flex gap-2 px-3 py-3">
@@ -48,9 +128,33 @@ export const ChatMessage = ({ message }: { message: UIMessage }) => {
             .trim();
           if (!text) return null;
           return (
-            <Streamdown key={`${message.id}-${i}`}>{text}</Streamdown>
+            <p
+              key={`${message.id}-${i}`}
+              className="whitespace-pre-wrap"
+            >
+              {text}
+            </p>
           );
         })}
+
+        {buttonResults.map((result, i) => (
+          <ChatButtonGroup
+            key={`${message.id}-buttons-${i}`}
+            type={result.type}
+            options={result.options}
+            onSelect={(value) => onButtonClick?.(value)}
+            disabled={disabledButtons}
+          />
+        ))}
+
+        {bookingResult && (
+          <ChatBookingCard
+            barbershopName={bookingResult.barbershopName}
+            serviceName={bookingResult.serviceName}
+            date={bookingResult.date}
+            time={bookingResult.time}
+          />
+        )}
       </div>
     </div>
   );
