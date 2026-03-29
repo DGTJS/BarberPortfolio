@@ -1,12 +1,8 @@
 import { Header } from "@/app/_components/Header";
 import { Footer } from "@/app/_components/Footer";
-import {
-  PageContainer,
-  PageSection,
-  PageSectionTitle,
-} from "@/app/_components/ui/page";
-import { BookingItem } from "@/app/_components/BookingItem";
+import { PageContainer } from "@/app/_components/ui/page";
 import { getUserBookingsAction } from "@/app/_actions/get-user-bookings";
+import { BookingsContent } from "./_components/BookingsContent";
 
 export default async function BookingsPage() {
   const result = await getUserBookingsAction();
@@ -14,103 +10,45 @@ export default async function BookingsPage() {
   if (!result?.data) {
     return (
       <>
-        <Header />
-        <PageContainer>
-          <PageSection>
-            <PageSectionTitle>Meus Agendamentos</PageSectionTitle>
+        <Header showSearch />
+        <div className="max-w-7xl mx-auto">
+          <PageContainer>
             <p className="text-muted-foreground">
               Você não tem agendamentos no momento.
             </p>
-          </PageSection>
-        </PageContainer>
+          </PageContainer>
+        </div>
         <Footer />
       </>
     );
   }
 
-  const bookings = result.data;
-  const now = new Date();
-
-  const confirmedBookings = bookings.filter((booking) => {
-    const bookingDate = new Date(booking.date);
-    return bookingDate > now && !booking.canceled;
-  });
-
-  const finishedAndCanceledBookings = bookings.filter((booking) => {
-    const bookingDate = new Date(booking.date);
-    return bookingDate <= now || booking.canceled;
-  });
-
-  const getBookingStatus = (booking: (typeof bookings)[0]) => {
-    const bookingDate = new Date(booking.date);
-    if (booking.canceled) {
-      return "canceled" as const;
-    }
-    if (bookingDate > now) {
-      return "confirmed" as const;
-    }
-    return "finished" as const;
-  };
+  const bookings = result.data.map((booking) => ({
+    id: booking.id,
+    service: {
+      name: booking.service.name,
+      priceInCents: booking.service.priceInCents,
+    },
+    barbershop: {
+      name: booking.barbershop.name,
+      imageUrl: booking.barbershop.imageUrl,
+      address: booking.barbershop.address,
+      description: booking.barbershop.description,
+      phones: booking.barbershop.phones,
+    },
+    date: new Date(booking.date),
+    canceled: booking.canceled,
+  }));
 
   return (
-    <main className="h-screen flex flex-col min-h-screen">
-      <Header />
-      <PageContainer className="flex-1">
-        <PageSection>
-          <PageSectionTitle>Agendamentos Confirmados</PageSectionTitle>
-          {confirmedBookings.length === 0 ? (
-            <p className="text-muted-foreground">
-              Você não tem agendamentos confirmados no momento.
-            </p>
-          ) : (
-            <div className="flex flex-col gap-4">
-              {confirmedBookings.map((booking) => (
-                <BookingItem
-                  key={booking.id}
-                  id={booking.id}
-                  serviceName={booking.service.name}
-                  barberShopName={booking.barbershop.name}
-                  barberShopImage={booking.barbershop.imageUrl}
-                  barberShopAddress={booking.barbershop.address}
-                  barberShopPhones={booking.barbershop.phones}
-                  servicePriceInCents={booking.service.priceInCents}
-                  date={new Date(booking.date)}
-                  canceled={booking.canceled}
-                  status={getBookingStatus(booking)}
-                />
-              ))}
-            </div>
-          )}
-        </PageSection>
-
-        <PageSection>
-          <PageSectionTitle>Agendamentos Finalizados</PageSectionTitle>
-          {finishedAndCanceledBookings.length === 0 ? (
-            <p className="text-muted-foreground">
-              Você não tem agendamentos finalizados ou cancelados.
-            </p>
-          ) : (
-            <div className="flex flex-col gap-4">
-              {finishedAndCanceledBookings.map((booking) => (
-                <BookingItem
-                  key={booking.id}
-                  id={booking.id}
-                  serviceName={booking.service.name}
-                  barberShopName={booking.barbershop.name}
-                  barberShopImage={booking.barbershop.imageUrl}
-                  barberShopAddress={booking.barbershop.address}
-                  barberShopPhones={booking.barbershop.phones}
-                  servicePriceInCents={booking.service.priceInCents}
-                  date={new Date(booking.date)}
-                  canceled={booking.canceled}
-                  status={getBookingStatus(booking)}
-                />
-              ))}
-            </div>
-          )}
-        </PageSection>
-      </PageContainer>
+    <>
+      <Header showSearch />
+      <main className="max-w-7xl mx-auto">
+        <PageContainer className="flex-1">
+          <BookingsContent bookings={bookings} />
+        </PageContainer>
+      </main>
       <Footer />
-    </main>
+    </>
   );
 }

@@ -1,6 +1,5 @@
 import { Header } from "@/app/_components/Header";
 import { Footer } from "@/app/_components/Footer";
-import { SearchInputs } from "@/app/_components/Search-inputs";
 import { BarberShopItem } from "@/app/_components/BarberShopItem";
 import {
   PageContainer,
@@ -35,9 +34,8 @@ export default async function BarbershopsPage({
 
   return (
     <>
-      <Header />
+      <Header showSearch />
       <PageContainer>
-        <SearchInputs />
         <PageSection>
           <PageSectionTitle>
             {search

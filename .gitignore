@@ -45,6 +45,5 @@ yarn-error.log*
 next-env.d.ts
 
 /app/generated/prisma
-/
 .kilocode/mcp.json
 .kilocode/mcp.json

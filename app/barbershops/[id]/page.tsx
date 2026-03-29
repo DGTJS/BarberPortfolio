@@ -63,61 +63,79 @@ const BarberShopPage = async (props: PageProps) => {
 
       {/* Main Container */}
       <div className="bg-background rounded-tl-[24px] rounded-tr-[24px] -mt-6 relative z-10">
-        <PageContainer>
-          {/* Barber Shop Info */}
-          <div className="flex gap-[5px] items-start">
-            <div className="flex flex-col gap-[4px]">
-              <div className="flex gap-[6px] items-start">
-                {/* Avatar Group - Using barbershop image repeated */}
-                <div className="relative w-[30px] h-[30px] rounded-full overflow-hidden">
-                  <Image
-                    src={barberShop.imageUrl}
-                    alt={barberShop.name}
-                    fill
-                    className="object-cover"
-                  />
+        <PageContainer className="mx-auto max-w-7xl">
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* Left Column: Info + Services */}
+            <div className="flex-1">
+              {/* Barber Shop Info */}
+              <div className="flex gap-[5px] items-start">
+                <div className="flex flex-col gap-[4px]">
+                  <div className="flex gap-[6px] items-start">
+                    <div className="relative w-[30px] h-[30px] rounded-full overflow-hidden">
+                      <Image
+                        src={barberShop.imageUrl}
+                        alt={barberShop.name}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <h1 className="font-bold text-[20px] text-foreground leading-normal">
+                      {barberShop.name}
+                    </h1>
+                  </div>
+                  <p className="text-[14px] text-muted-foreground leading-[1.4]">
+                    {barberShop.address}
+                  </p>
                 </div>
-                <h1 className="font-bold text-[20px] text-foreground leading-normal">
-                  {barberShop.name}
-                </h1>
               </div>
-              <p className="text-[14px] text-muted-foreground leading-[1.4]">
-                {barberShop.address}
-              </p>
+
+              <Separator className="my-6" />
+
+              {/* About Us Section */}
+              <div className="space-y-3">
+                <PageSectionTitle>Sobre Nós</PageSectionTitle>
+                <p className="text-[14px] text-foreground leading-[1.4]">
+                  {barberShop.description}
+                </p>
+              </div>
+
+              <Separator className="my-6" />
+
+              {/* Services Section */}
+              <div className="space-y-4">
+                <PageSectionTitle>Serviços</PageSectionTitle>
+                {barberShop.services.map((service) => (
+                  <ServiceItem
+                    key={service.id}
+                    service={service}
+                    barberShop={{ id: barberShop.id, name: barberShop.name }}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Right Column: Contact + Footer (Desktop only) */}
+            <div className="hidden lg:block lg:w-[300px] lg:shrink-0">
+              <div className="sticky top-8 space-y-6">
+                <div className="space-y-3">
+                  <PageSectionTitle>Contato</PageSectionTitle>
+                  <ContactInfo phones={barberShop.phones} />
+                </div>
+                <Separator />
+                <Footer />
+              </div>
             </div>
           </div>
 
-          <Separator className="my-6" />
-
-          {/* About Us Section */}
-          <div className="space-y-3">
-            <PageSectionTitle>Sobre Nós</PageSectionTitle>
-            <p className="text-[14px] text-foreground leading-[1.4]">
-              {barberShop.description}
-            </p>
+          {/* Contact + Footer (Mobile only) */}
+          <div className="lg:hidden">
+            <Separator className="my-6" />
+            <div className="space-y-3">
+              <PageSectionTitle>Contato</PageSectionTitle>
+              <ContactInfo phones={barberShop.phones} />
+            </div>
+            <Footer />
           </div>
-
-          <Separator className="my-6" />
-
-          {/* Services Section */}
-          {barberShop.services.map((service) => (
-            <ServiceItem
-              key={service.id}
-              service={service}
-              barberShop={{ id: barberShop.id, name: barberShop.name }}
-            />
-          ))}
-
-          <Separator className="my-6" />
-
-          {/* Contact Section */}
-          <div className="space-y-3">
-            <PageSectionTitle>Contato</PageSectionTitle>
-            <ContactInfo phones={barberShop.phones} />
-          </div>
-
-          {/* Footer */}
-          <Footer />
         </PageContainer>
       </div>
     </div>
