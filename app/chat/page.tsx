@@ -27,6 +27,10 @@ export default function ChatPage() {
     setInput("");
   };
 
+  const handleButtonClick = (value: string) => {
+    sendMessage({ text: value });
+  };
+
   return (
     <div className="flex h-dvh flex-col bg-background">
       <header className="flex items-center justify-between px-5 pt-6 pb-3">
@@ -48,7 +52,12 @@ export default function ChatPage() {
           </div>
 
           {messages.map((message) => (
-            <ChatMessage key={message.id} message={message} />
+            <ChatMessage
+              key={message.id}
+              message={message}
+              onButtonClick={handleButtonClick}
+              disabledButtons={status === "submitted" || status === "streaming"}
+            />
           ))}
 
           {(status === "submitted" || status === "streaming") && (
