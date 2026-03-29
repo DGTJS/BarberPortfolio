@@ -39,6 +39,10 @@ export const cancelBookingAction = actionClient
       });
     }
 
+    if (booking.canceled) {
+      throw new Error("Agendamento já cancelado");
+    }
+
     const updatedBooking = await prisma.booking.update({
       where: {
         id: bookingId,

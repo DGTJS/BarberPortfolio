@@ -10,7 +10,7 @@ export const getUserBookingsAction = actionClient.action(async () => {
   });
 
   if (!session?.user.id) {
-    throw new Error("Usuário não autenticado");
+    return [];
   }
 
   const bookings = await prisma.booking.findMany({

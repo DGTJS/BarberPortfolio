@@ -34,6 +34,7 @@ export const createBookingAction = actionClient
     const existingBooking = await prisma.booking.findFirst({
       where: {
         date,
+        barbershopId: service.barbershopId,
       },
     });
     if (existingBooking) {
