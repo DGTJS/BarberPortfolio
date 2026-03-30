@@ -31,7 +31,7 @@ export default function LoginPage() {
             <path d="m15 18-6-6 6-6" />
           </svg>
         </Link>
-        <h1 className="font-serif text-xl tracking-tight text-foreground">
+        <h1 className="font-serif text-xl tracking-tight text-foreground italic">
           aparatus
         </h1>
         <div className="flex size-10" />
