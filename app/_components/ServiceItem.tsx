@@ -77,6 +77,10 @@ export const ServiceItem = ({ service, barberShop }: ServiceItemProps) => {
   const canConfirm = Boolean(selectedDate && selectedTime);
 
   const handleOpenBooking = () => {
+    if (!session?.user) {
+      setLoginDialogOpen(true);
+      return;
+    }
     setSelectedDate(undefined);
     setSelectedTime(null);
     setIsSheetOpen(true);
@@ -103,11 +107,6 @@ export const ServiceItem = ({ service, barberShop }: ServiceItemProps) => {
 
   const handleConfirm = async () => {
     if (!selectedDate || !selectedTime) return;
-
-    if (!session?.user) {
-      setLoginDialogOpen(true);
-      return;
-    }
 
     const hourSplit = selectedTime.split(":");
     const hour = Number(hourSplit[0]);
